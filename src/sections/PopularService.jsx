@@ -194,12 +194,12 @@ const PopularService = ({isMobile}) => {
                             slidesPerGroup: 5,
                         },
                     }}
-                    className={showContent ? 'animate-fade-in-up' : 'animate-on-load'}
+                    className ={`!pb-12 ${showContent ? 'animate-fade-in-up' : 'animate-on-load'}`}
                 >
                 {services.map((service, index) => (
                 <SwiperSlide 
                     key={service.id}
-                    className={showContent ? `animate-fade-in animate-stagger-${Math.min(index + 1, 8)}` : 'animate-on-load'}
+                    className={showContent ? `animate-fade-in animate-stagger-${Math.min(index + 1, 8)}` : 'animate-on-load' }
                 >
                     <ServiceCard title={service.serviceTitle} image={service.serviceImage} />
                 </SwiperSlide>

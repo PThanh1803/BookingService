@@ -98,7 +98,7 @@ const PopularCategory = ({ isMobile }) => {
     }
 
     return (
-        <section className="py-16 pt-32 md:px-6 px-1 bg-gray-50">
+        <section className="md:py-16 py-2 md:pt-32 pt-16 md:px-6 px-1 bg-gray-50">
             <Container maxWidth="lg">
                 <Swiper
                     modules={[SwiperGrid, Pagination, Navigation]}
@@ -120,7 +120,7 @@ const PopularCategory = ({ isMobile }) => {
                             slidesPerGroup: 5,
                         },
                     }}
-                    className={showContent ? 'animate-fade-in-up' : 'animate-on-load'}
+                    className={`!pb-12 ${showContent ? 'animate-fade-in-up' : 'animate-on-load'}`}
                 >
                     {categories.map((category, index) => (
                         <SwiperSlide 

@@ -25,11 +25,11 @@ const Header = () => {
 
   return (
     <>
-      <header className="w-full top-0 left-0 right-0 z-50 p-6 max-w-7xl mx-auto " style={{maxWidth: "1200px"}}>
+      <header className="w-full top-0 left-0 right-0 z-10 p-6 max-w-7xl mx-auto " style={{maxWidth: "1200px"}}>
         <div className=" mx-auto ">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className=" md:text-3xl text-2xl font-bold no-underline">
+            <Link to="/" className=" md:text-3xl max-sm:text-white text-2xl font-bold no-underline">
               LUMINOVA
             </Link>
 
@@ -37,7 +37,7 @@ const Header = () => {
             <div className="flex items-center gap-4c ">
               <Link
                 to="/business"
-                className="px-4 py-2 text-gray-600 font-bold hover:text-teal-700 transition-color"
+                className="px-4 py-2 md:text-gray-600 text-white font-bold hover:text-teal-700 transition-color"
               >
                 For business
               </Link>

@@ -73,4 +73,9 @@ export const favoriteAPI = {
   deleteFavorite: (data) => api.post('/delete-favorite', data),
 };
 
+//Search APIs
+export const searchAPI = {
+  search: (q, city) => api.get(`/search?q=${q}&location=${city}`),
+};
+
 export default api; 

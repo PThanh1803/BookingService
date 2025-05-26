@@ -2,9 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, favoriteAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
-
-
-// Create the context
 const AuthContext = createContext();
 
 // Auth context provider component
@@ -14,8 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [favorites, setFavorites] = useState({});
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-
 
   useEffect(() => {
     // Check if user is logged in from localStorage
@@ -27,23 +22,23 @@ export const AuthProvider = ({ children }) => {
       const userData = JSON.parse(user);
       setCurrentUser(userData);
       setIsAuthenticated(true);
-      
+
       // Load favorites from user data
       if (userData.favorite) {
         const formattedFavorites = {};
-        
+
         if (userData.favorite.business) {
           userData.favorite.business.forEach(businessId => {
             formattedFavorites[`business-${businessId}`] = true;
           });
         }
-        
+
         if (userData.favorite.individual) {
           userData.favorite.individual.forEach(individualId => {
             formattedFavorites[`individual-${individualId}`] = true;
           });
         }
-        
+
         setFavorites(formattedFavorites);
         localStorage.setItem('favorites', JSON.stringify(formattedFavorites));
       } else if (storedFavorites) {
@@ -77,31 +72,31 @@ export const AuthProvider = ({ children }) => {
       if (!access_token || !user) {
         throw new Error('Mật khẩu hoặc email không chính xác');
       }
-      
+
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       setCurrentUser(user);
-      
+
       // Load favorites from user data returned by login
       if (user.favorite) {
         const formattedFavorites = {};
-        
+
         if (user.favorite.business) {
           user.favorite.business.forEach(businessId => {
             formattedFavorites[`business-${businessId}`] = true;
           });
         }
-        
+
         if (user.favorite.individual) {
           user.favorite.individual.forEach(individualId => {
             formattedFavorites[`individual-${individualId}`] = true;
           });
         }
-        
+
         setFavorites(formattedFavorites);
         localStorage.setItem('favorites', JSON.stringify(formattedFavorites));
       }
-      
+
       return true;
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
@@ -114,7 +109,7 @@ export const AuthProvider = ({ children }) => {
       // Validate required fields
       const requiredFields = ['name', 'email', 'password', 'phone', 'address'];
       const missingFields = requiredFields.filter(field => !userData[field]);
-      
+
       if (missingFields.length > 0) {
         throw new Error(`Vui lòng điền đầy đủ thông tin: ${missingFields.join(', ')}`);
       }
@@ -133,15 +128,15 @@ export const AuthProvider = ({ children }) => {
 
       const response = await authAPI.register(userData);
       const { token, user } = response.data;
-      
+
       if (!token || !user) {
         throw new Error('Đăng ký không thành công');
       }
-      
+
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       setCurrentUser(user);
-      
+
       return true;
     } catch (error) {
       console.error('Signup error:', error.response?.data || error.message);
@@ -169,16 +164,16 @@ export const AuthProvider = ({ children }) => {
     try {
       if (isFavorited) {
         // Remove from favorites
-        const response = await favoriteAPI.deleteFavorite({ 
-          type: type, 
-          favoriteId: id 
+        const response = await favoriteAPI.deleteFavorite({
+          type: type,
+          favoriteId: id
         });
         console.log(response);
         const newFavorites = { ...favorites };
         delete newFavorites[key];
         setFavorites(newFavorites);
         localStorage.setItem('favorites', JSON.stringify(newFavorites));
-        
+
         // Update user data in localStorage
         if (currentUser) {
           const updatedUser = { ...currentUser };
@@ -190,14 +185,14 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         // Add to favorites
-        await favoriteAPI.addFavorite({ 
-          type: type, 
-          favoriteId: id 
+        await favoriteAPI.addFavorite({
+          type: type,
+          favoriteId: id
         });
         const newFavorites = { ...favorites, [key]: true };
         setFavorites(newFavorites);
         localStorage.setItem('favorites', JSON.stringify(newFavorites));
-        
+
         // Update user data in localStorage
         if (currentUser) {
           const updatedUser = { ...currentUser };
@@ -216,7 +211,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
-      throw error; // Re-throw để component có thể handle error
+      throw error; 
     }
   };
 
