@@ -1,81 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, favoriteAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
-// Define initial state
-const initialState = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
-  favorites: {}
-};
 
-// Define action types
-const actionTypes = {
-  LOGIN_REQUEST: 'LOGIN_REQUEST',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
-  LOGIN_FAILURE: 'LOGIN_FAILURE',
-  LOGOUT: 'LOGOUT',
-  TOGGLE_FAVORITE: 'TOGGLE_FAVORITE',
-  SET_FAVORITES: 'SET_FAVORITES'
-};
-
-// Auth reducer
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case actionTypes.LOGIN_REQUEST:
-      return {
-        ...state,
-        isLoading: true,
-        error: null
-      };
-    case actionTypes.LOGIN_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: true,
-        user: action.payload,
-        error: null
-      };
-    case actionTypes.LOGIN_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: false,
-        user: null,
-        error: action.payload
-      };
-    case actionTypes.LOGOUT:
-      return {
-        ...state,
-        isAuthenticated: false,
-        user: null
-      };
-    case actionTypes.TOGGLE_FAVORITE:
-      const { id, type } = action.payload;
-      const key = `${type}-${id}`;
-      const newFavorites = { ...state.favorites };
-      
-      if (newFavorites[key]) {
-        delete newFavorites[key];
-      } else {
-        newFavorites[key] = true;
-      }
-      
-      return {
-        ...state,
-        favorites: newFavorites
-      };
-    case actionTypes.SET_FAVORITES:
-      return {
-        ...state,
-        favorites: action.payload
-      };
-    default:
-      return state;
-  }
-};
 
 // Create the context
 const AuthContext = createContext();
@@ -88,6 +15,8 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+
+
   useEffect(() => {
     // Check if user is logged in from localStorage
     const token = localStorage.getItem('token');
@@ -95,10 +24,38 @@ export const AuthProvider = ({ children }) => {
     const storedFavorites = localStorage.getItem('favorites');
 
     if (token && user) {
-      setCurrentUser(JSON.parse(user));
+      const userData = JSON.parse(user);
+      setCurrentUser(userData);
       setIsAuthenticated(true);
-    }
-    if (storedFavorites) {
+      
+      // Load favorites from user data
+      if (userData.favorite) {
+        const formattedFavorites = {};
+        
+        if (userData.favorite.business) {
+          userData.favorite.business.forEach(businessId => {
+            formattedFavorites[`business-${businessId}`] = true;
+          });
+        }
+        
+        if (userData.favorite.individual) {
+          userData.favorite.individual.forEach(individualId => {
+            formattedFavorites[`individual-${individualId}`] = true;
+          });
+        }
+        
+        setFavorites(formattedFavorites);
+        localStorage.setItem('favorites', JSON.stringify(formattedFavorites));
+      } else if (storedFavorites) {
+        // Fallback to stored favorites if user.favorite is empty
+        try {
+          setFavorites(JSON.parse(storedFavorites));
+        } catch (error) {
+          console.error('Failed to parse stored favorites:', error);
+        }
+      }
+    } else if (storedFavorites) {
+      // Fallback to stored favorites if user not authenticated
       try {
         setFavorites(JSON.parse(storedFavorites));
       } catch (error) {
@@ -124,6 +81,26 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       setCurrentUser(user);
+      
+      // Load favorites from user data returned by login
+      if (user.favorite) {
+        const formattedFavorites = {};
+        
+        if (user.favorite.business) {
+          user.favorite.business.forEach(businessId => {
+            formattedFavorites[`business-${businessId}`] = true;
+          });
+        }
+        
+        if (user.favorite.individual) {
+          user.favorite.individual.forEach(individualId => {
+            formattedFavorites[`individual-${individualId}`] = true;
+          });
+        }
+        
+        setFavorites(formattedFavorites);
+        localStorage.setItem('favorites', JSON.stringify(formattedFavorites));
+      }
       
       return true;
     } catch (error) {
@@ -175,6 +152,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('favorites');
     setCurrentUser(null);
     navigate('/');
   };
@@ -184,18 +162,62 @@ export const AuthProvider = ({ children }) => {
     return !!favorites[key];
   };
 
-  const toggleFavorite = (id, type) => {
+  const toggleFavorite = async (id, type) => {
     const key = `${type}-${id}`;
-    const newFavorites = { ...favorites };
+    const isFavorited = !!favorites[key];
 
-    if (newFavorites[key]) {
-      delete newFavorites[key];
-    } else {
-      newFavorites[key] = true;
+    try {
+      if (isFavorited) {
+        // Remove from favorites
+        const response = await favoriteAPI.deleteFavorite({ 
+          type: type, 
+          favoriteId: id 
+        });
+        console.log(response);
+        const newFavorites = { ...favorites };
+        delete newFavorites[key];
+        setFavorites(newFavorites);
+        localStorage.setItem('favorites', JSON.stringify(newFavorites));
+        
+        // Update user data in localStorage
+        if (currentUser) {
+          const updatedUser = { ...currentUser };
+          if (updatedUser.favorite && updatedUser.favorite[type]) {
+            updatedUser.favorite[type] = updatedUser.favorite[type].filter(favId => favId !== id);
+          }
+          setCurrentUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+      } else {
+        // Add to favorites
+        await favoriteAPI.addFavorite({ 
+          type: type, 
+          favoriteId: id 
+        });
+        const newFavorites = { ...favorites, [key]: true };
+        setFavorites(newFavorites);
+        localStorage.setItem('favorites', JSON.stringify(newFavorites));
+        
+        // Update user data in localStorage
+        if (currentUser) {
+          const updatedUser = { ...currentUser };
+          if (!updatedUser.favorite) {
+            updatedUser.favorite = { business: [], individual: [] };
+          }
+          if (!updatedUser.favorite[type]) {
+            updatedUser.favorite[type] = [];
+          }
+          if (!updatedUser.favorite[type].includes(id)) {
+            updatedUser.favorite[type].push(id);
+          }
+          setCurrentUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      throw error; // Re-throw để component có thể handle error
     }
-
-    setFavorites(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify(newFavorites));
   };
 
   // Context values to expose

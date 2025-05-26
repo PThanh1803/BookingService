@@ -15,7 +15,7 @@ export const LocationProvider = ({ children }) => {
   const [cities, setCities] = useState([]);
   const [currentCity, setCurrentCity] = useState('');
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
 
   const findNearestCity = (latitude, longitude, citiesData) => {
     if (!citiesData || citiesData.length === 0) return null;
@@ -100,10 +100,10 @@ export const LocationProvider = ({ children }) => {
             console.log('Unable to get user location:', locationError);
           }
 
-          // Try user's saved location
-          if (user?.location) {
+          if (currentUser?.address) {
+            console.log('Using user address to find city:', currentUser.address);
             const userCity = citiesData.find(c => 
-              c.name.toLowerCase().includes(user.location.toLowerCase())
+              c.name.toLowerCase().includes(currentUser.address.toLowerCase())
             )?.name;
             if (userCity) {
               setCurrentCity(userCity);
@@ -127,7 +127,7 @@ export const LocationProvider = ({ children }) => {
     };
 
     fetchCitiesAndSetDefault();
-  }, [user]);
+  }, [currentUser]);
 
   return (
     <LocationContext.Provider 

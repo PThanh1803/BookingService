@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Typography } from '@mui/material';
 import { businessAPI } from '../services/api';
 import CardItem from '../components/CardItem';
+import { CardItemSkeleton } from '../components/skeletons';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Grid as SwiperGrid, Pagination, Navigation } from 'swiper/modules';
 
@@ -9,6 +10,7 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
     const [businesses, setBusinesses] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
+    const [showContent, setShowContent] = React.useState(false);
 
     React.useEffect(() => {
         const getBusinesses = async () => {
@@ -17,8 +19,8 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
                 setError(null);
                 const response = await businessAPI.getBusiness();
                 console.log(response);
-                if (response.data.length > 0) {
-                    setBusinesses(response.data);
+                if (response.data.status === 200 ) {
+                    setBusinesses(response.data.data);
                 }
                 else {
                     setError('Không có doanh nghiệp nào');
@@ -29,6 +31,10 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
                 console.log(err);
             } finally {
                 setIsLoading(false);
+                // Delay để tạo hiệu ứng mượt mà
+                setTimeout(() => {
+                    setShowContent(true);
+                }, 100);
             }
         };
         getBusinesses();
@@ -36,14 +42,48 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
 
     if (isLoading) {
         return (
-            <section className="py-8 pb-2 md:px-6 bg-white">
+            <section className="py-6 pb-2 md:px-6 bg-white">
                 <Container maxWidth="lg">
-                    <Typography variant="h5" fontFamily="serif" fontWeight={550} className="text-left text-black block !mb-4 md:!mb-10">
+                    <Typography variant="h5" fontFamily="serif" fontWeight={550} className="text-left text-black block !mb-4 md:!mb-6">
                         Popular businesses
                     </Typography>
-                    <div className="flex items-center justify-center min-h-[300px]">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-                    </div>
+                    
+                    <Swiper
+                        modules={[SwiperGrid, Pagination, Navigation]}      
+                        spaceBetween={24}
+                        grid={{ rows: 1, fill: 'row' }}
+                        pagination={{ clickable: true }}
+                        navigation={!isMobile} 
+                        breakpoints={{
+                            0: {
+                                slidesPerView: 1.2,
+                                slidesPerGroup: 1,
+                                spaceBetween: 16,
+                            },
+                            480: {
+                                slidesPerView: 2.2,
+                                slidesPerGroup: 2,
+                                spaceBetween: 20,
+                            },
+                            640: {
+                                slidesPerView: 3.2,
+                                slidesPerGroup: 3,
+                                spaceBetween: 24,
+                            },
+                            1024: {
+                                slidesPerView: 4,
+                                slidesPerGroup: 4,
+                                spaceBetween: 24,
+                            }
+                        }}
+                        className="!pb-12"
+                    >
+                        {[...Array(8)].map((_, index) => (
+                            <SwiperSlide key={index} className="h-auto">
+                                <CardItemSkeleton />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
                 </Container>
             </section>
         );
@@ -58,13 +98,8 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
                     </Typography>
                     <div className="flex items-center justify-center min-h-[300px]">
                         <div className="text-center">
-                            <p className="text-red-500 mb-2">{error}</p>
-                            <button 
-                                onClick={() => window.location.reload()}
-                                className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
-                            >
-                                Thử lại
-                            </button>
+                            <p className="text-black-500 mb-2">{error}</p>
+                            
                         </div>
                     </div>
                 </Container>
@@ -90,35 +125,53 @@ const PopularBusiness = ({isMobile, handleLoginRequired}) => {
     return (
         <section className="py-6 pb-2 md:px-6 bg-white">
             <Container maxWidth="lg">
-                <Typography variant="h5" fontFamily="serif" fontWeight={550} className="text-left text-black block !mb-4 md:!mb-6">
+                <Typography 
+                    variant="h5" 
+                    fontFamily="serif" 
+                    fontWeight={550} 
+                    className={`text-left text-black block !mb-4 md:!mb-6 ${showContent ? 'animate-slide-in-left' : 'animate-on-load'}`}
+                >
                     Popular businesses
                 </Typography>
 
                 <Swiper
                     modules={[SwiperGrid, Pagination, Navigation]}      
-                    spaceBetween={16}
+                    spaceBetween={24}
                     grid={{ rows: 1, fill: 'row' }}
                     pagination={{ clickable: true }}
                     navigation={!isMobile} 
                     breakpoints={{
                         0: {
-                            slidesPerView: 2,
-                            slidesPerGroup: 2,
+                            slidesPerView: 1.2,
+                            slidesPerGroup: 1,
+                            spaceBetween: 16,
                         },
                         480: {
-                            slidesPerView: 3,
-                            slidesPerGroup: 3,
+                            slidesPerView: 2.2,
+                            slidesPerGroup: 2,
+                            spaceBetween: 20,
                         },
                         640: {
+                            slidesPerView: 3.2,
+                            slidesPerGroup: 3,
+                            spaceBetween: 24,
+                        },
+                        1024: {
                             slidesPerView: 4,
                             slidesPerGroup: 4,
-                        },
+                            spaceBetween: 24,
+                        }
                     }}
+                    className={`!pb-12 ${showContent ? 'animate-fade-in-up' : 'animate-on-load'}`}
                 >
-                    {businesses.map((business) => (
-                        <SwiperSlide key={business.id}>
+                    {businesses.map((business, index) => (
+                        <SwiperSlide 
+                            key={business.id} 
+                            className={`h-auto ${showContent ? `animate-fade-in animate-stagger-${Math.min(index + 1, 8)}` : 'animate-on-load'}`}
+                        >
                             <CardItem {...business}
-                                type="salon"
+                                type="business"
+                                id={business._id}
                                 onLoginRequired={handleLoginRequired}
                             />
                         </SwiperSlide>

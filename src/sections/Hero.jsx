@@ -14,7 +14,7 @@ import { useLocation } from '../context/LocationContext';
 
 const Hero = () => {
   const { cities, currentCity, setCurrentCity, loading, refreshLocation } = useLocation();
-  const { user } = useAuth(); // Hook để lấy thông tin user
+  const { currentUser } = useAuth(); // Hook để lấy thông tin user
 
   return (
     <div

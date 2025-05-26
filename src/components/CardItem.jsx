@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { IconButton, Rating } from '@mui/material';
+import React from 'react';
+import { IconButton } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import StarIcon from '@mui/icons-material/Star';
@@ -8,7 +8,8 @@ const CardItem = ({
   type,
   name,
   description,
-  rating,
+  avgRating,
+  ratings,
   image,
   onFavoriteClick,
   onLoginRequired
@@ -16,26 +17,28 @@ const CardItem = ({
   const { isAuthenticated, isFavorite, toggleFavorite } = useAuth();
   const isFav = isFavorite(id, type);
 
-  const [rate, setRate] = useState(0);
-
-  useEffect(() => {
-    if (rating && rating.length > 0) {
-      let sum = 0;
-      rating.forEach(rate => {
-        sum += rate.rate;
-      });
-      setRate(sum / rating.length);
+  const getRating = () => {
+    if (ratings && ratings.length > 0) {
+      const total = ratings.reduce((acc, curr) => acc + curr.rate, 0);
+      return total / ratings.length;
     }
-  }, [rating]);
+    return 0;
+  };
 
-  const handleFavoriteClick = () => {
+  const handleFavoriteClick = async () => {
     if (!isAuthenticated) {
       onLoginRequired();
       return;
     }
-    toggleFavorite(id, type);
-    if (onFavoriteClick) {
-      onFavoriteClick(id, !isFav);
+    
+    try {
+      await toggleFavorite(id, type);
+      if (onFavoriteClick) {
+        onFavoriteClick(id, !isFav);
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      // Có thể hiển thị thông báo lỗi cho user
     }
   };
 
@@ -80,7 +83,7 @@ const CardItem = ({
           /> */}
           <StarIcon className="text-yellow-500" sx={{ fontSize: 16 }} />
           <span className="text-xs font-bold text-gray-700 ml-1">
-          {rate?.toFixed(1) ?? 'N/A'}
+          { avgRating?.toFixed(1) ?? getRating().toFixed(1) }
           </span>
         </div>
 
@@ -97,7 +100,7 @@ const CardItem = ({
           <h3 className="text-base font-medium text-gray-900">{name}</h3>
         </div>
         
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
       </div>
     </div>
   );

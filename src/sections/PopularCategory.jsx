@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Grid } from "@mui/material";
 import CategoryCard from "../components/CategoryCard";
+import { CategoryCardSkeleton } from "../components/skeletons";
 import { categoryAPI } from "../services/api";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Grid as SwiperGrid, Pagination, Navigation } from 'swiper/modules';
@@ -9,6 +10,7 @@ const PopularCategory = ({ isMobile }) => {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
         const getCategories = async () => {
@@ -16,8 +18,9 @@ const PopularCategory = ({ isMobile }) => {
                 setIsLoading(true);
                 setError(null);
                 const response = await categoryAPI.getCategories();
-                if (response.data.length > 0) {
-                    setCategories(response.data);
+                console.log(response);
+                if (response.data.status === 200 && response.data.data.length > 0) {
+                    setCategories(response.data.data);
                 }
                 else {
                     setError('Không có danh mục nào');
@@ -26,6 +29,9 @@ const PopularCategory = ({ isMobile }) => {
                 setError(err.response?.data?.message || 'Có lỗi xảy ra khi tải danh mục');
             } finally {
                 setIsLoading(false);
+                setTimeout(() => {
+                    setShowContent(true);
+                }, 100);
             }
         };
         getCategories();
@@ -33,9 +39,37 @@ const PopularCategory = ({ isMobile }) => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-[200px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-            </div>
+            <section className="py-16 pt-32 md:px-6 px-1 bg-gray-50">
+                <Container maxWidth="lg">
+                    <Swiper
+                        modules={[SwiperGrid, Pagination, Navigation]}
+                        spaceBetween={12}
+                        pagination={{ clickable: true }}
+                        navigation={!isMobile}
+                        grid={{ rows: 2, fill: 'row' }}
+                        breakpoints={{
+                            0: {
+                                slidesPerView: 2,
+                                slidesPerGroup: 2,                         
+                            },
+                            480: {
+                                slidesPerView: 2,
+                                slidesPerGroup: 2,
+                            },
+                            640: {
+                                slidesPerView: 5,
+                                slidesPerGroup: 5,
+                            },
+                        }}
+                    >
+                        {[...Array(20)].map((_, index) => (
+                            <SwiperSlide key={index}>
+                                <CategoryCardSkeleton />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </Container>
+            </section>
         );
     }
 
@@ -86,9 +120,13 @@ const PopularCategory = ({ isMobile }) => {
                             slidesPerGroup: 5,
                         },
                     }}
+                    className={showContent ? 'animate-fade-in-up' : 'animate-on-load'}
                 >
-                    {categories.map((category) => (
-                        <SwiperSlide key={category.id}>
+                    {categories.map((category, index) => (
+                        <SwiperSlide 
+                            key={category.id}
+                            className={showContent ? `animate-fade-in animate-stagger-${Math.min(index + 1, 8)}` : 'animate-on-load'}
+                        >
                             <CategoryCard {...category} />
                         </SwiperSlide>
                     ))}

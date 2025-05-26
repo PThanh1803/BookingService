@@ -6,10 +6,10 @@ const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    token: localStorage.getItem('token'),
   },
 });
 
-// Add a request interceptor to add token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -33,11 +33,12 @@ export const authAPI = {
 export const userAPI = {
   getUsers: () => api.get('/users'),
   updateUser: (data) => api.put('/update', data),
+
 };
 
 // Service APIs
 export const serviceAPI = {
-  getServices: () => api.get('/services'),
+  getServices: (city) => api.get(`/services/by-city?city=${city}`),
   createService: (data) => api.post('/services', data),
   updateService: (id, data) => api.put(`/services/${id}`, data),
 };
@@ -64,6 +65,12 @@ export const individualAPI = {
   getIndividualById: (id) => api.get(`/individuals/${id}`),
   createIndividual: (data) => api.post('/individuals', data),
   updateIndividual: (id, data) => api.put(`/individuals/${id}`, data),
+};
+
+// Favorite APIs
+export const favoriteAPI = {
+  addFavorite: (data) => api.post('/add-favorite', data),
+  deleteFavorite: (data) => api.post('/delete-favorite', data),
 };
 
 export default api; 
