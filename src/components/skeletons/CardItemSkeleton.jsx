@@ -2,7 +2,7 @@ import React from 'react';
 
 const CardItemSkeleton = () => {
   return (
-    <div className="rounded-md transition-all duration-300 w-64 animate-pulse">
+    <div className="rounded-md transition-all duration-300 md:w-64 w-40 animate-pulse">
       {/* Image Skeleton */}
       <div className="relative md:h-48 md:w-64 h-36 w-40 overflow-hidden rounded-lg bg-gray-200">
         {/* Favorite button skeleton */}

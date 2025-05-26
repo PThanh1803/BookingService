@@ -10,10 +10,10 @@ const Footer = () => {
   return (
     <footer className=" text-white py-8 max-sm:px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           {/* Logo and Description */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-1">
-            <Link to="/" className="text-2xl font-bold text-black mb-4 block">
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 text-center">
+            <Link to="/" className="text-2xl font-bold text-black  block">
               LUMINOVA
             </Link>
             
@@ -21,9 +21,9 @@ const Footer = () => {
 
           
           {/* Copyright */}
-        <div className="text-center text-gray-400">
-          <p>© Luminova 2024. All rights reserved.</p>
-        </div>
+          <div className="text-center text-gray-400 max-sm:hidden">
+            <p>© Luminova 2024. All rights reserved.</p>
+          </div>
           
 
           {/* Social Media */}
@@ -57,7 +57,9 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
+        <div className="text-center text-gray-400 hidden max-sm:block">
+            <p>© Luminova 2024. All rights reserved.</p>
+          </div>
         
       </div>
     </footer>

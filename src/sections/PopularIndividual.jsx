@@ -52,19 +52,9 @@ const PopularIndividual = ({isMobile, handleLoginRequired}) => {
                         navigation={!isMobile} 
                         breakpoints={{
                             0: {
-                                slidesPerView: 1.2,
-                                slidesPerGroup: 1,
-                                spaceBetween: 16,
-                            },
-                            480: {
-                                slidesPerView: 2.2,
+                                slidesPerView: 2,
                                 slidesPerGroup: 2,
-                                spaceBetween: 20,
-                            },
-                            640: {
-                                slidesPerView: 3.2,
-                                slidesPerGroup: 3,
-                                spaceBetween: 24,
+                                spaceBetween: 8
                             },
                             1024: {
                                 slidesPerView: 4,
@@ -115,19 +105,9 @@ const PopularIndividual = ({isMobile, handleLoginRequired}) => {
                 navigation={!isMobile} 
                 breakpoints={{
                     0: {
-                        slidesPerView: 1.2,
-                        slidesPerGroup: 1,
-                        spaceBetween: 16,
-                    },
-                    480: {
-                        slidesPerView: 2.2,
+                        slidesPerView: 2,
                         slidesPerGroup: 2,
-                        spaceBetween: 20,
-                    },
-                    640: {
-                        slidesPerView: 3.2,
-                        slidesPerGroup: 3,
-                        spaceBetween: 24,
+                        spaceBetween: 8
                     },
                     1024: {
                         slidesPerView: 4,

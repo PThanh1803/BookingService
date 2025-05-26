@@ -43,7 +43,7 @@ const CardItem = ({
   };
 
   return (
-    <div className="rounded-md hover:cursor-pointer transition-all duration-300 w-64">
+    <div className="rounded-md hover:cursor-pointer transition-all duration-300 md:w-64 w-40">
       {/* Image */}
       <div className="relative md:h-48 md:w-64 h-36 w-40 overflow-hidden rounded-lg">
         <img
@@ -95,7 +95,7 @@ const CardItem = ({
       </div>
 
       {/* Content */}
-      <div className="p-3">
+      <div className="md:p-3 p-2 md:w-64 w-40 ">
         <div className="flex items-start mb-1">
           <h3 className="text-base font-medium text-gray-900">{name}</h3>
         </div>
