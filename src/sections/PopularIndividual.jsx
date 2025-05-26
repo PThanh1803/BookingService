@@ -124,6 +124,7 @@ const PopularIndividual = ({isMobile, handleLoginRequired}) => {
                 >
                   <CardItem {...individual}
                     type="individual"
+                    id={individual._id}
                     onLoginRequired={handleLoginRequired}
                   />
                 </SwiperSlide>

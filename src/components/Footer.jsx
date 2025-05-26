@@ -15,8 +15,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2 lg:col-span-1 text-center">
             <Link to="/" className="text-2xl font-bold text-black  block">
               LUMINOVA
-            </Link>
-            
+            </Link>           
           </div>
 
           
