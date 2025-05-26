@@ -10,7 +10,7 @@ import { Search, LocationOn } from '@mui/icons-material';
 import Header from '../components/Navbar'; // Path to Navbar.jsx
 import { useLocation } from '../context/LocationContext';
 import { useMediaQuery, useTheme } from '@mui/material';
-import bannerImageMobile from '../assets/banner1.jpg'; // Path to your mobile image
+import bannerImageMobile from '../assets/bannerMobile.jpg'; // Path to your mobile image
 import bannerImageDesktop from '../assets/banner.jpg'; // Path to your desktop image
 import SearchPopup from '../components/SearchPopup'; // Path to SearchPopup.jsx
 import { searchAPI } from '../services/api'; // Adjust the import path as needed
