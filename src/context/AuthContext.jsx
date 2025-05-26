@@ -149,7 +149,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('favorites');
     setCurrentUser(null);
-    navigate('/');
+    setFavorites({});
+    setIsAuthenticated(false);
+    navigate('/'); // Redirect to login page after logout
   };
 
   const isFavorite = (id, type) => {
